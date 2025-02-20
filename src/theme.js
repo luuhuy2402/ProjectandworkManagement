@@ -12,17 +12,54 @@ const theme = extendTheme({
                 primary: teal,
                 secondary: deepOrange,
             },
-            // spacing: (factor) => `${0.25 * factor}rem`, //cuastom spacing
         },
         dark: {
             palette: {
                 primary: cyan,
                 secondary: orange,
             },
-            // spacing: (factor) => `${0.25 * factor}rem`,
         },
     },
-    // Mặc định hệ thống theo chế độ "system"
+    components: {
+        // Name of the component
+        MuiButton: {
+            styleOverrides: {
+                // Name of the slot
+                root: { textTransform: "none" },
+            },
+        },
+        MuiInputLabel: {
+            styleOverrides: {
+                // Name of the slot
+                root: ({ theme }) => ({
+                    color: theme.palette.primary.main,
+                    fontSize: "0.875rem",
+                }),
+            },
+        },
+        MuiOutlinedInput: {
+            styleOverrides: {
+                // Name of the slot
+                root: ({ theme }) => {
+                    return {
+                        color: theme.palette.primary.main,
+                        fontSize: "0.875rem",
+                        ".MuiOutlinedInput-notchedOutline": {
+                            borderColor: theme.palette.primary.light,
+                        },
+                        "&:hover": {
+                            ".MuiOutlinedInput-notchedOutline": {
+                                borderColor: theme.palette.primary.main,
+                            },
+                        },
+                        // "& fieldset": {
+                        //     borderWidth: "1px !important", //đậm nhạt đường viền
+                        // },
+                    };
+                },
+            },
+        },
+    },
 });
 
 export default theme;

@@ -31,6 +31,7 @@ function AppBar() {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     <SvgIcon
                         component={Zentask}
+                        fontSize="small"
                         inheritViewBox
                         sx={{ color: "primary.main" }}
                     />
@@ -65,12 +66,14 @@ function AppBar() {
                         variant="dot"
                         sx={{ cursor: "pointer" }}
                     >
-                        <NotificationsNoneIcon />
+                        <NotificationsNoneIcon sx={{ color: "primary.main" }} />
                     </Badge>
                 </Tooltip>
 
                 <Tooltip title="Help">
-                    <HelpOutlineIcon sx={{ cursor: "pointer" }} />
+                    <HelpOutlineIcon
+                        sx={{ cursor: "pointer", color: "primary.main" }}
+                    />
                 </Tooltip>
 
                 <Profiles />
