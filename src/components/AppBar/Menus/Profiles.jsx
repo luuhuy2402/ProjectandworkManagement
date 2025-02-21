@@ -32,7 +32,7 @@ function Profiles() {
                     aria-expanded={open ? "true" : undefined}
                 >
                     <Avatar
-                        sx={{ width: 34, height: 34 }}
+                        sx={{ width: 36, height: 36 }}
                         alt="Avatar"
                         src="https://hoanghamobile.com/tin-tuc/wp-content/webp-express/webp-images/uploads/2024/04/hinh-anh-de-thuong-2.jpg.webp"
                     />
