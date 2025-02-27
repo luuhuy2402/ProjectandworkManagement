@@ -1,9 +1,14 @@
 import { experimental_extendTheme as extendTheme } from "@mui/material/styles";
 
+const APP_BAR_HEIGHT = "58px";
+const BOARD_BAR_HEIGHT = "60px";
+const BOARD_CONTENT_HEIGHT = `calc(100vh - ${APP_BAR_HEIGHT} - ${BOARD_BAR_HEIGHT})`;
+
 const theme = extendTheme({
     custom: {
-        appBarHeight: "58px",
-        boardBarHeight: "60px",
+        appBarHeight: APP_BAR_HEIGHT,
+        boardBarHeight: BOARD_BAR_HEIGHT,
+        boardContentHeight: BOARD_CONTENT_HEIGHT,
     },
     colorSchemes: {
         light: {},
@@ -12,15 +17,15 @@ const theme = extendTheme({
     components: {
         MuiCssBaseline: {
             styleOverrides: {
-                "::-webkit-scrollbar": {
+                "*::-webkit-scrollbar": {
                     width: "4px",
                     height: "4px",
                 },
-                "::-webkit-scrollbar-thumb": {
+                "*::-webkit-scrollbar-thumb": {
                     borderRadius: "6px",
                     backgroundColor: "#dcdde1",
                 },
-                "::-webkit-scrollbar-thumb:hover": {
+                "*::-webkit-scrollbar-thumb:hover": {
                     backgroundColor: "white",
                 },
             },
@@ -42,6 +47,16 @@ const theme = extendTheme({
                 root: {
                     // color: theme.palette.primary.main,
                     fontSize: "0.875rem",
+                },
+            },
+        },
+        MuiTypography: {
+            styleOverrides: {
+                // Name of the slot
+                root: {
+                    "&.MuiTypography-body1": {
+                        fontSize: "0.875rem",
+                    },
                 },
             },
         },
