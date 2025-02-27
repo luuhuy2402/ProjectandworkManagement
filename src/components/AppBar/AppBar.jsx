@@ -1,5 +1,5 @@
 import { Box, SvgIcon, Typography } from "@mui/material";
-import ModeSelect from "~/components/ModeSelect";
+import ModeSelect from "~/components/ModeSelect/ModeSelect";
 import AppsIcon from "@mui/icons-material/Apps";
 import Zentask from "~/assets/zentask.svg?react";
 import Workspaces from "~/components/AppBar/Menus/Workspaces";
