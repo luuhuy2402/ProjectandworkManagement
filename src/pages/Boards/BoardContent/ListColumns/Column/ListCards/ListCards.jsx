@@ -1,7 +1,8 @@
 import { Box } from "@mui/material";
+import PropTypes from 'prop-types';
 import CardItem from "~/pages/Boards/BoardContent/ListColumns/Column/ListCards/CardItem/CardItem";
 
-function ListCards() {
+function ListCards({ cards }) {
     return (
         <Box
             sx={{
@@ -26,10 +27,18 @@ function ListCards() {
                 },
             }}
         >
-            <CardItem />
-            <CardItem temporaryHideMedia />
+            {cards?.map((card) => (
+                <CardItem key={card._id} card={card} />
+            ))}
         </Box>
     );
 }
+ListCards.propTypes = {
+    cards: PropTypes.arrayOf(PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        // add other card properties here if needed
+    })).isRequired,
+};
+
 
 export default ListCards;

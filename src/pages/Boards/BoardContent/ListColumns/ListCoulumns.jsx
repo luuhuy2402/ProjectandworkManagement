@@ -1,8 +1,9 @@
 import { Box, Button } from "@mui/material";
+import PropTypes from "prop-types";
 import Column from "~/pages/Boards/BoardContent/ListColumns/Column/Column";
 import QueueIcon from "@mui/icons-material/Queue";
 
-function ListCoulumns() {
+function ListCoulumns({ columns }) {
     return (
         <Box
             sx={{
@@ -15,9 +16,9 @@ function ListCoulumns() {
                 "&::-webkit-scrollbar-track": { m: 2 },
             }}
         >
-            {/* box coloumn 1 */}
-            <Column />
-            <Column />
+            {columns?.map((column) => (
+                <Column key={column._id} column={column} />
+            ))}
 
             <Box
                 sx={{
@@ -45,5 +46,8 @@ function ListCoulumns() {
         </Box>
     );
 }
+ListCoulumns.propTypes = {
+    columns: PropTypes.array.isRequired,
+};
 
 export default ListCoulumns;
