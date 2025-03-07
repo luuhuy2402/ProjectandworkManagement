@@ -7,8 +7,26 @@ import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import AttachmentIcon from "@mui/icons-material/Attachment";
 import { Button, Typography } from "@mui/material";
 import PropTypes from "prop-types";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 function CardItem({ card }) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: card._id, data: { ...card } });
+
+    const dndKitCardStyles = {
+        // toachAction: "none",
+        transform: CSS.Translate.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : undefined,
+    };
+
     const shouldShowCardActions = !!(
         card?.memberIds?.length ||
         card?.comments?.length ||
@@ -16,6 +34,10 @@ function CardItem({ card }) {
     );
     return (
         <Card
+            ref={setNodeRef}
+            style={dndKitCardStyles}
+            {...attributes}
+            {...listeners}
             sx={{
                 cursor: "pointer",
                 boxShadow: "0 1px 1px rgba(0,0,0,0.2)",
@@ -58,6 +80,7 @@ function CardItem({ card }) {
 // 🛠️ Khai báo kiểu dữ liệu cho props
 CardItem.propTypes = {
     card: PropTypes.shape({
+        _id: PropTypes.string.isRequired,
         memberIds: PropTypes.arrayOf(PropTypes.string),
         comments: PropTypes.arrayOf(PropTypes.string),
         attachments: PropTypes.arrayOf(PropTypes.string),
