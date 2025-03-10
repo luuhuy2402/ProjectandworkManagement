@@ -12,9 +12,13 @@ import {
     DragOverlay,
     defaultDropAnimationSideEffects,
     closestCorners,
+    pointerWithin,
+    rectIntersection,
+    getFirstCollision,
+    closestCenter,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Column from "~/pages/Boards/BoardContent/ListColumns/Column/Column";
 import CardItem from "~/pages/Boards/BoardContent/ListColumns/Column/ListCards/CardItem/CardItem";
 import { cloneDeep } from "lodash";
@@ -57,6 +61,8 @@ function BoardContent({ board }) {
     const [activeDragItemData, setActiveDragItemData] = useState(null);
     const [oldColumnWhenDraggingCard, setOldColumnWhenDraggingCard] =
         useState(null);
+    //Điểm va chạm cuối cùng (xử lý thuật toán phát hiện va chạm)
+    const lastOverId = useRef(null);
 
     useEffect(() => {
         setOrderedColumns(
@@ -320,6 +326,54 @@ function BoardContent({ board }) {
             },
         }),
     };
+
+    // custom lại thuật toán phát hiện va chạm tối ưu cho việc kéo thả card giữa nhiều columns
+    // args = arguments = các đối số, tham số
+    const collisionDetectionStrategy = useCallback(
+        (args) => {
+            //trường hợp kéo column thì dùng thuật toán closestCorners là chuẩn nhất
+            if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
+                return closestCorners({ ...args });
+            }
+            // Tìm các điểm giao nhau, va cham - intersections với con trỏ
+            const pointerIntersections = pointerWithin(args);
+            //Thuật toán phát hiện va chạm sẽ trả về một mảng các va chạm ở đây
+            const intersections = !!pointerIntersections?.length
+                ? pointerIntersections
+                : rectIntersection(args);
+
+            //Tìm overId đầu tiên trong đám intersection ở trên
+            let overId = getFirstCollision(intersections, "id");
+            console.log("overId: ", overId);
+            if (overId) {
+                // Nếu cái over nó là column thì sẽ tìm tới cái cardId gần nhất bên trong khu vực va chạm đó đưa vào thuật toán phát hiện va chạm
+                //closestCenter hoặc closestCorners đều được. Tuy nhiên ở đây cùng closestCenter vì nó mượt hơn
+                const checkColumn = orderedColumns.find(
+                    (column) => column._id === overId
+                );
+                if (checkColumn) {
+                    console.log("overId before:", overId);
+                    overId = closestCenter({
+                        ...args,
+                        droppableContainers: args.droppableContainers.filter(
+                            (container) =>
+                                container.id !== overId &&
+                                checkColumn?.cardOrderIds?.includes(
+                                    container.id
+                                )
+                        ),
+                    })[0]?.id;
+                    console.log("overId after:", overId);
+                }
+
+                lastOverId.current = overId;
+                return [{ id: overId }];
+            }
+            // Nếu overId là null thì trả về mảng rỗng - tránh bug crash trang
+            return lastOverId.current ? [{ id: lastOverId.current }] : [];
+        },
+        [activeDragItemType, orderedColumns]
+    );
     return (
         <DndContext
             onDragStart={handleDragStart}
@@ -329,7 +383,10 @@ function BoardContent({ board }) {
             sensors={sensors}
             //thuật toán phát hiện va chạm ( nếu ko có thì card với cover lớn sẽ ko kéo qua được column)
             //https://docs.dndkit.com/api-documentation/context-provider/collision-detection-algorithms
-            collisionDetection={closestCorners}
+            // Nếu chỉ dùng closestCorners sẽ có bug flickering + sai lệch dữ liệu
+            // collisionDetection={closestCorners}
+            // custom nâng cao thuật toán phát hiện va chạm
+            collisionDetection={collisionDetectionStrategy}
         >
             <Box
                 sx={{

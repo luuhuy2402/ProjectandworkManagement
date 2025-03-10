@@ -41,6 +41,8 @@ export default [
                     patterns: ["@mui/*/*/*"],
                 },
             ],
+
+            "no-extra-boolean-cast": 0,
         },
     },
 ];
