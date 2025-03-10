@@ -13,9 +13,7 @@ import {
     defaultDropAnimationSideEffects,
     closestCorners,
     pointerWithin,
-    rectIntersection,
     getFirstCollision,
-    closestCenter,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -337,23 +335,21 @@ function BoardContent({ board }) {
             }
             // Tìm các điểm giao nhau, va cham - intersections với con trỏ
             const pointerIntersections = pointerWithin(args);
-            //Thuật toán phát hiện va chạm sẽ trả về một mảng các va chạm ở đây
-            const intersections = !!pointerIntersections?.length
-                ? pointerIntersections
-                : rectIntersection(args);
+            // Tiếp tục fix bug flickering: kéo 1 card ra khỏi vùng kéo thả
+            if (!pointerIntersections?.length) return;
 
             //Tìm overId đầu tiên trong đám intersection ở trên
-            let overId = getFirstCollision(intersections, "id");
+            let overId = getFirstCollision(pointerIntersections, "id");
             console.log("overId: ", overId);
             if (overId) {
                 // Nếu cái over nó là column thì sẽ tìm tới cái cardId gần nhất bên trong khu vực va chạm đó đưa vào thuật toán phát hiện va chạm
-                //closestCenter hoặc closestCorners đều được. Tuy nhiên ở đây cùng closestCenter vì nó mượt hơn
+                //closestCenter hoặc closestCorners đều được. Tuy nhiên ở đây cùng closestCorners vì nó mượt hơn
                 const checkColumn = orderedColumns.find(
                     (column) => column._id === overId
                 );
                 if (checkColumn) {
                     console.log("overId before:", overId);
-                    overId = closestCenter({
+                    overId = closestCorners({
                         ...args,
                         droppableContainers: args.droppableContainers.filter(
                             (container) =>
