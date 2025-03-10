@@ -17,3 +17,13 @@ console.log("capString:", capString);
  * stringTest: Of course, nothing changes =))
  * capString: Xeoxeo
  */
+
+//hàm tạo ra card giữ chỗ khi column kéo hết card đi ( column rỗng ko có card)
+export const generatePlaceholderCard = (column) => {
+    return {
+        _id: `${column._id}-placeholder-card`,
+        boardId: column.boardId,
+        columnId: column._id,
+        FE_PlaceholderCard: true,
+    };
+};
