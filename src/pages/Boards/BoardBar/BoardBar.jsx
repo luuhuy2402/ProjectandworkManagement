@@ -1,5 +1,5 @@
 import { Box, Tooltip } from "@mui/material";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import Chip from "@mui/material/Chip";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import VpnLockIcon from "@mui/icons-material/VpnLock";
@@ -27,6 +27,7 @@ const MENU_STYLES = {
 };
 
 function BoardBar({ board }) {
+    console.log(board);
     return (
         <Box
             sx={{
@@ -140,13 +141,11 @@ function BoardBar({ board }) {
     );
 }
 
-
 BoardBar.propTypes = {
     board: PropTypes.shape({
         title: PropTypes.string,
         type: PropTypes.string,
     }).isRequired,
 };
-
 
 export default BoardBar;
