@@ -10,7 +10,7 @@ import BoardContent from "~/pages/Boards/BoardContent/BoardContent";
 function Board() {
     const [board, setBoard] = useState(null);
     useEffect(() => {
-        const boardId = "67db8e1449c8b5b5bf0269ad";
+        const boardId = "67dcbf2b405b5a4a4396b15a";
         //Call API
         fetchBoardDetailsAPI(boardId).then((board) => {
             setBoard(board);
