@@ -82,7 +82,7 @@ function Column({ column }) {
                             ? "#3a3f59" // "#333643"
                             : "#b7f1f3", // "#ebecf0",
                     ml: 2,
-                    pb:0.5,
+                    pb: 0.5,
                     borderRadius: "6px",
                     height: "fit-content",
                     maxHeight: (theme) =>
@@ -223,6 +223,7 @@ function Column({ column }) {
                                 type="text"
                                 size="small"
                                 variant="outlined"
+                                data-no-dnd="true"
                                 autoFocus
                                 value={newCardTitle}
                                 onChange={(e) =>
@@ -267,6 +268,7 @@ function Column({ column }) {
                                     alignItems: "center",
                                     gap: 1,
                                 }}
+                                data-no-dnd="true"
                             >
                                 <Button
                                     onClick={addNewCard}
