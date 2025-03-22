@@ -8,7 +8,7 @@ import {
 } from "@dnd-kit/sortable";
 import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
-
+import { toast } from "react-toastify";
 function ListCoulumns({ columns }) {
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
     const toggleOpenNewColumnForm = () =>
@@ -17,7 +17,7 @@ function ListCoulumns({ columns }) {
     const [newColumnTitle, setNewColumnTitle] = useState("");
     const addNewColumn = () => {
         if (!newColumnTitle) {
-            console.error("Please enter column title");
+            toast.warn("Please enter column title", { theme: "colored" });
             return;
         }
         console.log(newColumnTitle);
