@@ -21,7 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 
-function Column({ column }) {
+function Column({ column, createNewCard }) {
     const {
         attributes,
         listeners,
@@ -57,7 +57,7 @@ function Column({ column }) {
     const [openNewCardForm, setOpenNewCardForm] = useState(false);
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm);
     const [newCardTitle, setNewCardTitle] = useState("");
-    const addNewCard = () => {
+    const addNewCard = async () => {
         if (!newCardTitle) {
             toast.warn("Please enter card title", {
                 position: "bottom-right",
@@ -65,8 +65,15 @@ function Column({ column }) {
             });
             return;
         }
-        console.log(newCardTitle);
-        // Gọi  API
+
+        // Tạo dữ liệu mới cho column để gọi API
+        const newCardData = {
+            title: newCardTitle,
+            columnId: column._id,
+        };
+        //goị hàm gọi API tạo mới Card
+        // Gọi lêm function tạo mới Card ở component cha cao nhất ( hiện tại chưa sử dụng redux )
+        await createNewCard(newCardData);
 
         //Đóng lại trạng thái thêm Column mới & clear input
         toggleOpenNewCardForm();

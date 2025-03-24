@@ -9,19 +9,24 @@ import {
 import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
-function ListCoulumns({ columns }) {
+function ListCoulumns({ columns, createNewColumn, createNewCard }) {
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
     const toggleOpenNewColumnForm = () =>
         setOpenNewColumnForm(!openNewColumnForm);
 
     const [newColumnTitle, setNewColumnTitle] = useState("");
-    const addNewColumn = () => {
+    const addNewColumn = async () => {
         if (!newColumnTitle) {
             toast.warn("Please enter column title", { theme: "colored" });
             return;
         }
-        console.log(newColumnTitle);
-        // Gọi  API
+        // Tạo dữ liệu mới cho column để gọi API
+        const newColumnData = {
+            title: newColumnTitle,
+        };
+        //goị hàm gọi API tạo mới Column
+        // Gọi lêm function tạo mới Column ở component cha cao nhất ( hiện tại chưa sử dụng redux )
+        await createNewColumn(newColumnData);
 
         //Đóng lại trạng thái thêm Column mới & clear input
         toggleOpenNewColumnForm();
@@ -48,7 +53,11 @@ function ListCoulumns({ columns }) {
                 }}
             >
                 {columns?.map((column) => (
-                    <Column key={column._id} column={column} />
+                    <Column
+                        key={column._id}
+                        column={column}
+                        createNewCard={createNewCard}
+                    />
                 ))}
 
                 {/* Box Add new Column CTA */}

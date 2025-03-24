@@ -27,7 +27,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
     COLUMN: "ACTIVE_DRAG-ITEM_TYPE_COLUMN",
     CARD: "ACTIVE_DRAG-ITEM_TYPE_CARD",
 };
-function BoardContent({ board }) {
+function BoardContent({ board, createNewColumn, createNewCard }) {
     // Nếu sử dụng PointerSensor thì kết hợp thêm thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng trên moblie sẽ hoạt động ko tốt
     // const pointerSensor = useSensor(PointerSensor, {
     //     // Require the mouse to move by 10 pixels before activating
@@ -410,7 +410,11 @@ function BoardContent({ board }) {
                     p: "10px 0",
                 }}
             >
-                <ListCoulumns columns={orderedColumns} />
+                <ListCoulumns
+                    columns={orderedColumns}
+                    createNewColumn={createNewColumn}
+                    createNewCard={createNewCard}
+                />
                 <DragOverlay dropAnimation={customDropAnimation}>
                     {!activeDragItemType && null}
                     {activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN && (
