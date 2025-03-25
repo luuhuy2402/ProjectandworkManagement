@@ -27,7 +27,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
     COLUMN: "ACTIVE_DRAG-ITEM_TYPE_COLUMN",
     CARD: "ACTIVE_DRAG-ITEM_TYPE_CARD",
 };
-function BoardContent({ board, createNewColumn, createNewCard }) {
+function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
     // Nếu sử dụng PointerSensor thì kết hợp thêm thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng trên moblie sẽ hoạt động ko tốt
     // const pointerSensor = useSensor(PointerSensor, {
     //     // Require the mouse to move by 10 pixels before activating
@@ -319,6 +319,9 @@ function BoardContent({ board, createNewColumn, createNewCard }) {
                 );
                 // Thứ tự id mới sau khi di chuyển
                 // const dndOrderedColumnsIds = dndOrderedColumns.map((c) => c._id);
+
+                //Truyền mảng columns đã được sắp xếp lại vào hàm moveColumns(FILE _id.jsx)
+                moveColumns(dndOrderedColumns);
 
                 // Cập nhật lại state sau khi kéo thả
                 setOrderedColumns(dndOrderedColumns);

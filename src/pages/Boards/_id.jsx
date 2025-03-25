@@ -6,6 +6,7 @@ import {
     createNewCardAPI,
     createNewColumnAPI,
     fetchBoardDetailsAPI,
+    updateBoardDetailsAPI,
 } from "~/apis";
 // import { mockData } from "~/apis/mock-data";
 import AppBar from "~/components/AppBar/AppBar";
@@ -74,6 +75,21 @@ function Board() {
         setBoard(newBoard);
     };
 
+    // Goị API khi xử lý kéo thả column xong
+    const moveColumns = async (dndOrderedColumns) => {
+        const dndOrderedColumnsIds = dndOrderedColumns.map((c) => c._id);
+        //này là cập nhật phía UI để tránh bị flickering khi mà API chưa trả về
+        const newBoard = { ...board };
+        newBoard.columns = dndOrderedColumns;
+        newBoard.columnOrderIds = dndOrderedColumnsIds;
+        setBoard(newBoard);
+
+        //Call API update board
+        await updateBoardDetailsAPI(board._id, {
+            columnOrderIds: dndOrderedColumnsIds,
+        });
+    };
+
     return (
         <Container disableGutters maxWidth="false" sx={{ height: "100vh" }}>
             <AppBar />
@@ -82,6 +98,7 @@ function Board() {
                 board={board}
                 createNewColumn={createNewColumn}
                 createNewCard={createNewCard}
+                moveColumns={moveColumns}
             />
         </Container>
     );
