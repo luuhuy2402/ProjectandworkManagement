@@ -1,5 +1,6 @@
 // Board details
 import { Container } from "@mui/material";
+import { isEmpty } from "lodash";
 import { useEffect, useState } from "react";
 import {
     createNewCardAPI,
@@ -10,6 +11,7 @@ import {
 import AppBar from "~/components/AppBar/AppBar";
 import BoardBar from "~/pages/Boards/BoardBar/BoardBar";
 import BoardContent from "~/pages/Boards/BoardContent/BoardContent";
+import { generatePlaceholderCard } from "~/utils/formatters";
 
 function Board() {
     const [board, setBoard] = useState(null);
@@ -17,6 +19,14 @@ function Board() {
         const boardId = "67e0b0e9e39fefaf98d82e33";
         //Call API
         fetchBoardDetailsAPI(boardId).then((board) => {
+            // xử lý khi mới tạo column mà chưa có card thì tạo thêm 1 card giữ chỗ để kéo thả được
+            board.columns.forEach((column) => {
+                if (isEmpty(column.cards)) {
+                    column.cards = [generatePlaceholderCard(column)];
+                    column.cardOrderIds = [generatePlaceholderCard(column)._id];
+                }
+            });
+            console.log(board);
             setBoard(board);
         });
     }, []);
@@ -27,6 +37,12 @@ function Board() {
             ...newColumnData,
             boardId: board._id,
         });
+
+        //Thêm card giữ chỗ vào column mới tạo
+        createdColumn.cards = [generatePlaceholderCard(createdColumn)];
+        createdColumn.cardOrderIds = [
+            generatePlaceholderCard(createdColumn)._id,
+        ];
 
         /**Cập nhật lại board
          * Phiá FE tự làm đúng lại state data board thay vì goi lai api fetchBoardDetailsAPI
