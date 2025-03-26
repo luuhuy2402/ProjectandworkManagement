@@ -15,7 +15,7 @@ function ListCoulumns({ columns, createNewColumn, createNewCard }) {
         setOpenNewColumnForm(!openNewColumnForm);
 
     const [newColumnTitle, setNewColumnTitle] = useState("");
-    const addNewColumn = async () => {
+    const addNewColumn = () => {
         if (!newColumnTitle) {
             toast.warn("Please enter column title", { theme: "colored" });
             return;
@@ -26,7 +26,7 @@ function ListCoulumns({ columns, createNewColumn, createNewCard }) {
         };
         //goị hàm gọi API tạo mới Column
         // Gọi lêm function tạo mới Column ở component cha cao nhất ( hiện tại chưa sử dụng redux )
-        await createNewColumn(newColumnData);
+        createNewColumn(newColumnData);
 
         //Đóng lại trạng thái thêm Column mới & clear input
         toggleOpenNewColumnForm();

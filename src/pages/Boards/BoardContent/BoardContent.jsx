@@ -27,7 +27,13 @@ const ACTIVE_DRAG_ITEM_TYPE = {
     COLUMN: "ACTIVE_DRAG-ITEM_TYPE_COLUMN",
     CARD: "ACTIVE_DRAG-ITEM_TYPE_CARD",
 };
-function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
+function BoardContent({
+    board,
+    createNewColumn,
+    createNewCard,
+    moveColumns,
+    moveCardInTheSameColumn,
+}) {
     // Nếu sử dụng PointerSensor thì kết hợp thêm thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng trên moblie sẽ hoạt động ko tốt
     // const pointerSensor = useSensor(PointerSensor, {
     //     // Require the mouse to move by 10 pixels before activating
@@ -279,6 +285,10 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
                     oldCardIndex,
                     newCardIndex
                 );
+                const dndOrderedCardIds = dndOrderedCards.map(
+                    (card) => card._id
+                );
+                //vẫn cần update state ở đây để tránh delay hoặc Flickering giao dienj lúc kéo thả cần chời gọi API
                 setOrderedColumns((prevColumns) => {
                     //Clone marng OrderedColumnsState cũ ra một cái mới để xử lý data rồi return - cập nhật lại OrderedColumnState mới
                     const nextColumns = cloneDeep(prevColumns);
@@ -289,12 +299,16 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
 
                     // Cập nhật lại 2 giá trị mới là card và cardOrderIds trong targetColumn
                     targetColumn.cards = dndOrderedCards;
-                    targetColumn.cardOrderIds = dndOrderedCards.map(
-                        (card) => card._id
-                    );
+                    targetColumn.cardOrderIds = dndOrderedCardIds;
                     // Trả về giá trị state mới (chuẩn vị trí )
                     return nextColumns;
                 });
+                //Gọi lên props function moveCardInTheSamColumn nằm ở component cha cao nhất
+                moveCardInTheSameColumn(
+                    dndOrderedCards, //máng card đã sắp
+                    dndOrderedCardIds, //mảng id đã sắp
+                    oldColumnWhenDraggingCard._id //id của column đang kéo card
+                );
             }
         }
 
@@ -317,14 +331,14 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
                     oldColumnIndex,
                     newColumnIndex
                 );
+                // Cập nhật lại state sau khi kéo thả
+                setOrderedColumns(dndOrderedColumns);
+
                 // Thứ tự id mới sau khi di chuyển
                 // const dndOrderedColumnsIds = dndOrderedColumns.map((c) => c._id);
 
                 //Truyền mảng columns đã được sắp xếp lại vào hàm moveColumns(FILE _id.jsx)
                 moveColumns(dndOrderedColumns);
-
-                // Cập nhật lại state sau khi kéo thả
-                setOrderedColumns(dndOrderedColumns);
             }
         }
 

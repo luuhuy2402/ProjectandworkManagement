@@ -7,6 +7,7 @@ import {
     createNewColumnAPI,
     fetchBoardDetailsAPI,
     updateBoardDetailsAPI,
+    updateColumnDetailsAPI,
 } from "~/apis";
 // import { mockData } from "~/apis/mock-data";
 import AppBar from "~/components/AppBar/AppBar";
@@ -76,7 +77,8 @@ function Board() {
     };
 
     // Goị API khi xử lý kéo thả column xong
-    const moveColumns = async (dndOrderedColumns) => {
+    //Cập nhật lai mảng columnOrderIds của Board
+    const moveColumns = (dndOrderedColumns) => {
         const dndOrderedColumnsIds = dndOrderedColumns.map((c) => c._id);
         //này là cập nhật phía UI để tránh bị flickering khi mà API chưa trả về
         const newBoard = { ...board };
@@ -85,9 +87,31 @@ function Board() {
         setBoard(newBoard);
 
         //Call API update board
-        await updateBoardDetailsAPI(board._id, {
+        updateBoardDetailsAPI(board._id, {
             columnOrderIds: dndOrderedColumnsIds,
         });
+    };
+
+    /**Khi di chuyển card trong cùng 1 Column
+     * Chỉ cần gọi API để cập nhật mảng cardOrderIds của Column chứa nó
+     */
+    const moveCardInTheSameColumn = (
+        dndOrderedCards,
+        dndOrderedCardIds,
+        columnId
+    ) => {
+        //update lại state board
+        const newBoard = { ...board };
+        const columnToUpdate = newBoard.columns.find(
+            (column) => column._id === columnId
+        );
+        if (columnToUpdate) {
+            columnToUpdate.cards = dndOrderedCards;
+            columnToUpdate.cardOrderIds = dndOrderedCardIds;
+        }
+        setBoard(newBoard);
+        //Gọi API update column
+        updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds });
     };
 
     return (
@@ -99,6 +123,7 @@ function Board() {
                 createNewColumn={createNewColumn}
                 createNewCard={createNewCard}
                 moveColumns={moveColumns}
+                moveCardInTheSameColumn={moveCardInTheSameColumn}
             />
         </Container>
     );

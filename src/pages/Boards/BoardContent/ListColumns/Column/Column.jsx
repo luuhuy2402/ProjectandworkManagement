@@ -57,7 +57,7 @@ function Column({ column, createNewCard }) {
     const [openNewCardForm, setOpenNewCardForm] = useState(false);
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm);
     const [newCardTitle, setNewCardTitle] = useState("");
-    const addNewCard = async () => {
+    const addNewCard = () => {
         if (!newCardTitle) {
             toast.warn("Please enter card title", {
                 position: "bottom-right",
@@ -73,7 +73,7 @@ function Column({ column, createNewCard }) {
         };
         //goị hàm gọi API tạo mới Card
         // Gọi lêm function tạo mới Card ở component cha cao nhất ( hiện tại chưa sử dụng redux )
-        await createNewCard(newCardData);
+        createNewCard(newCardData);
 
         //Đóng lại trạng thái thêm Column mới & clear input
         toggleOpenNewCardForm();
