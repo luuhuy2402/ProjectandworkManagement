@@ -15,7 +15,6 @@ import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import AddCardIcon from "@mui/icons-material/AddCard";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import ListCards from "~/pages/Boards/BoardContent/ListColumns/Column/ListCards/ListCards";
-import { mapOrder } from "~/utils/sorts";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import CloseIcon from "@mui/icons-material/Close";
@@ -51,8 +50,8 @@ function Column({ column, createNewCard }) {
     const handleClose = () => {
         setAnchorEl(null);
     };
-
-    const orderedCards = mapOrder(column?.cards, column?.cardOrderIds, "_id");
+    //Cards đã được sắp xếp ở component cha _id
+    const orderedCards = column.cards;
 
     const [openNewCardForm, setOpenNewCardForm] = useState(false);
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm);

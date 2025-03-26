@@ -1,7 +1,6 @@
 import { Box } from "@mui/material";
 import PropTypes from "prop-types";
 import ListCoulumns from "~/pages/Boards/BoardContent/ListColumns/ListCoulumns";
-import { mapOrder } from "~/utils/sorts";
 import {
     DndContext,
     // PointerSensor,
@@ -71,9 +70,8 @@ function BoardContent({
     const lastOverId = useRef(null);
 
     useEffect(() => {
-        setOrderedColumns(
-            mapOrder(board?.columns, board?.columnOrderIds, "_id")
-        );
+        //Colum đã được sắp xếp bên component cha _id
+        setOrderedColumns(board.columns);
     }, [board]);
 
     const findColumnByCardId = (cardId) => {

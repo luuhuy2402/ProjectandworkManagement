@@ -1,5 +1,5 @@
 // Board details
-import { Container } from "@mui/material";
+import { Box, CircularProgress, Container, Typography } from "@mui/material";
 import { isEmpty } from "lodash";
 import { useEffect, useState } from "react";
 import {
@@ -14,6 +14,7 @@ import AppBar from "~/components/AppBar/AppBar";
 import BoardBar from "~/pages/Boards/BoardBar/BoardBar";
 import BoardContent from "~/pages/Boards/BoardContent/BoardContent";
 import { generatePlaceholderCard } from "~/utils/formatters";
+import { mapOrder } from "~/utils/sorts";
 
 function Board() {
     const [board, setBoard] = useState(null);
@@ -21,11 +22,25 @@ function Board() {
         const boardId = "67e0b0e9e39fefaf98d82e33";
         //Call API
         fetchBoardDetailsAPI(boardId).then((board) => {
-            // xử lý khi mới tạo column mà chưa có card thì tạo thêm 1 card giữ chỗ để kéo thả được
+            //Sắp xếp thứ tự column trước khi đưa dữ liệu xuống bên dưới
+            board.columns = mapOrder(
+                board.columns,
+                board.columnOrderIds,
+                "_id"
+            );
+
             board.columns.forEach((column) => {
+                // xử lý khi mới tạo column mà chưa có card thì tạo thêm 1 card giữ chỗ để kéo thả được
                 if (isEmpty(column.cards)) {
                     column.cards = [generatePlaceholderCard(column)];
                     column.cardOrderIds = [generatePlaceholderCard(column)._id];
+                } else {
+                    // Sắp xếp thứ tự cards trước khi đưa dữ liệu xuống bên dưới
+                    column.cards = mapOrder(
+                        column.cards,
+                        column.cardOrderIds,
+                        "_id"
+                    );
                 }
             });
             console.log(board);
@@ -113,6 +128,24 @@ function Board() {
         //Gọi API update column
         updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds });
     };
+
+    if (!board) {
+        return (
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 2,
+                    width: "100vw",
+                    height: "100vh",
+                }}
+            >
+                <CircularProgress />
+                <Typography>Loading Board...</Typography>
+            </Box>
+        );
+    }
 
     return (
         <Container disableGutters maxWidth="false" sx={{ height: "100vh" }}>
