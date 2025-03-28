@@ -6,6 +6,7 @@ import {
     createNewCardAPI,
     createNewColumnAPI,
     fetchBoardDetailsAPI,
+    movingCardToDifferentColumnAPI,
     updateBoardDetailsAPI,
     updateColumnDetailsAPI,
 } from "~/apis";
@@ -128,6 +129,41 @@ function Board() {
         //Gọi API update column
         updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds });
     };
+    /**Khi di chuyển card sang Column khác
+     * B1: Cập nhật mảng cardOrderIds cùa Column ban đầu chứa nó
+     * B2: Cập nhật mảng cardOrderIds của Column tiếp theo
+     * B3: Cập nhập lại trường columnId mới của Card đã kéo
+     */
+    const moveCardToDifferentColumn = (
+        currentCardId,
+        prevColumnId,
+        nextColumnId,
+        dndOrderedColumns
+    ) => {
+        const dndOrderedColumnsIds = dndOrderedColumns.map((c) => c._id);
+        //này là cập nhật phía UI để tránh bị flickering khi mà API chưa trả về
+        const newBoard = { ...board };
+        newBoard.columns = dndOrderedColumns;
+        newBoard.columnOrderIds = dndOrderedColumnsIds;
+        setBoard(newBoard);
+        // console.log("currentCardId",currentCardId)
+        // console.log("prevColumnId",prevColumnId)
+        // console.log("nextColumnId",nextColumnId)
+        // console.log("dndOrderedColumns",dndOrderedColumns)
+
+        //Call API
+        movingCardToDifferentColumnAPI({
+            currentCardId,
+            prevColumnId,
+            prevCardOrderIds: dndOrderedColumns.find(
+                (c) => c._id === prevColumnId
+            )?.cardOrderIds,
+            nextColumnId,
+            nextCardOrderIds: dndOrderedColumns.find(
+                (c) => c._id === nextColumnId
+            )?.cardOrderIds,
+        });
+    };
 
     if (!board) {
         return (
@@ -157,6 +193,7 @@ function Board() {
                 createNewCard={createNewCard}
                 moveColumns={moveColumns}
                 moveCardInTheSameColumn={moveCardInTheSameColumn}
+                moveCardToDifferentColumn={moveCardToDifferentColumn}
             />
         </Container>
     );

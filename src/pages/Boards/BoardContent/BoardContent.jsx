@@ -32,6 +32,7 @@ function BoardContent({
     createNewCard,
     moveColumns,
     moveCardInTheSameColumn,
+    moveCardToDifferentColumn,
 }) {
     // Nếu sử dụng PointerSensor thì kết hợp thêm thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng trên moblie sẽ hoạt động ko tốt
     // const pointerSensor = useSensor(PointerSensor, {
@@ -88,7 +89,8 @@ function BoardContent({
         over,
         activeColumn,
         activeDraggingCardId,
-        activeDraggingCardData
+        activeDraggingCardData,
+        triggerForm
     ) => {
         setOrderedColumns((prevColumns) => {
             //tìm vị trí của overCard trong column đích ( nơi activeCard sắp được thả)
@@ -164,12 +166,27 @@ function BoardContent({
                     (card) => card._id
                 );
             }
+
+            //Nếu được gọi từ handleDragEnd
+            if (triggerForm === "handleDragEnd") {
+                /**
+                 * Phải dùng tới activeDragItemData.columnId hoặc tốt nhất là oldColumnDraggingCard._id (set vào state từ bước handleDragStart)
+                 * chứ không phải activeData trong scope handleDragEnd này vì sau khi đi qua onDragOver và tới đây là state của card đã bị
+                 * cập nhật một lần rồi
+                 */
+                moveCardToDifferentColumn(
+                    activeDraggingCardId,
+                    oldColumnWhenDraggingCard._id,
+                    nextOverColumn._id,
+                    nextColumns
+                );
+            }
             return nextColumns;
         });
     };
-    // Khi bắt đầu kéo thả
+    // Khi bắt đầu kéo thả gọi API
     const handleDragStart = (event) => {
-        console.log("Handle Drag Start", event);
+        // console.log("Handle Drag Start", event);
         setActiveDragItemId(event?.active?.id);
         setActiveDragItemType(
             event?.active?.data?.current?.columnId
@@ -221,7 +238,8 @@ function BoardContent({
                 over,
                 activeColumn,
                 activeDraggingCardId,
-                activeDraggingCardData
+                activeDraggingCardData,
+                "handleDragOver"
             );
         }
     };
@@ -253,6 +271,7 @@ function BoardContent({
             //Nếu không tồn tại 1 trong 2 column thì không làm gì hết
             if (!activeColumn || !overColumn) return;
 
+            //Hành động kéo thả card giữa 2 column khác nhau
             // Phải dùng tơi activerDragItemData.columnId hoặc oldColumnWhenDraggingCard._id( set vào state từ bước handleDragStart)
             //chứ không phải activeData trong scope handleDragEnd vì sau khi đi qua onDragOvẻ state của card đã bị cập nhật một lần
             if (oldColumnWhenDraggingCard._id !== overColumn._id) {
@@ -263,7 +282,8 @@ function BoardContent({
                     over,
                     activeColumn,
                     activeDraggingCardId,
-                    activeDraggingCardData
+                    activeDraggingCardData,
+                    "handleDragEnd"
                 );
             } else {
                 //hành động kéo thả card trong cùng 1 column
@@ -372,7 +392,7 @@ function BoardContent({
 
             //Tìm overId đầu tiên trong đám intersection ở trên
             let overId = getFirstCollision(pointerIntersections, "id");
-            console.log("overId: ", overId);
+            // console.log("overId: ", overId);
             if (overId) {
                 // Nếu cái over nó là column thì sẽ tìm tới cái cardId gần nhất bên trong khu vực va chạm đó đưa vào thuật toán phát hiện va chạm
                 //closestCenter hoặc closestCorners đều được. Tuy nhiên ở đây cùng closestCorners vì nó mượt hơn
@@ -380,7 +400,7 @@ function BoardContent({
                     (column) => column._id === overId
                 );
                 if (checkColumn) {
-                    console.log("overId before:", overId);
+                    // console.log("overId before:", overId);
                     overId = closestCorners({
                         ...args,
                         droppableContainers: args.droppableContainers.filter(
@@ -391,7 +411,7 @@ function BoardContent({
                                 )
                         ),
                     })[0]?.id;
-                    console.log("overId after:", overId);
+                    // console.log("overId after:", overId);
                 }
 
                 lastOverId.current = overId;
