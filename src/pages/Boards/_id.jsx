@@ -44,7 +44,7 @@ function Board() {
                     );
                 }
             });
-            console.log(board);
+
             setBoard(board);
         });
     }, []);
@@ -129,6 +129,7 @@ function Board() {
         //Gọi API update column
         updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds });
     };
+
     /**Khi di chuyển card sang Column khác
      * B1: Cập nhật mảng cardOrderIds cùa Column ban đầu chứa nó
      * B2: Cập nhật mảng cardOrderIds của Column tiếp theo
@@ -146,18 +147,23 @@ function Board() {
         newBoard.columns = dndOrderedColumns;
         newBoard.columnOrderIds = dndOrderedColumnsIds;
         setBoard(newBoard);
-        // console.log("currentCardId",currentCardId)
-        // console.log("prevColumnId",prevColumnId)
-        // console.log("nextColumnId",nextColumnId)
-        // console.log("dndOrderedColumns",dndOrderedColumns)
 
         //Call API
+        /**
+         * fix trường hợp khi kéo card cuối cùng đi thì trong column sẽ có 1 cái card giữ chỗ thì có id không đúng định dạng nên sẽ bị bug
+         * Nên khi mà card cuối cùng của column mà id chứa placeholder-card thì sẽ cho mảng idcardOrderIds của column đó là mảng rỗng trước khi
+         * gửi lên phía BE
+         */
+        let prevCardOrderIds = dndOrderedColumns.find(
+            (c) => c._id === prevColumnId
+        )?.cardOrderIds;
+        if (prevCardOrderIds[0].includes("placeholder-card"))
+            prevCardOrderIds = [];
+
         movingCardToDifferentColumnAPI({
             currentCardId,
             prevColumnId,
-            prevCardOrderIds: dndOrderedColumns.find(
-                (c) => c._id === prevColumnId
-            )?.cardOrderIds,
+            prevCardOrderIds,
             nextColumnId,
             nextCardOrderIds: dndOrderedColumns.find(
                 (c) => c._id === nextColumnId
