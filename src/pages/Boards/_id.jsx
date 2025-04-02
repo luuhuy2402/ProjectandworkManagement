@@ -85,10 +85,20 @@ function Board() {
         const columnToUpdate = newBoard.columns.find(
             (column) => column._id === createdCard.columnId
         );
+
         if (columnToUpdate) {
-            columnToUpdate.cards.push(createdCard);
-            columnToUpdate.cardOrderIds.push(createdCard._id);
+            //Nếu column rỗng(bản chất vẫn đang chứa 1 cái Placeholder card) thì khi thêm card mới sẽ xóa card đó đi còn
+            //ngược lại column ko rỗng thì thêm card thì sẽ thêm tiếp vào cuối mảng
+            if (columnToUpdate.cards.some((card) => card.FE_PlaceholderCard)) {
+                columnToUpdate.cards = [createdCard];
+                columnToUpdate.cardOrderIds = [createdCard._id];
+            } else {
+                columnToUpdate.cards.push(createdCard);
+                columnToUpdate.cardOrderIds.push(createdCard._id);
+            }
+            console.log("🚀 ~ createNewCard ~ columnToUpdate:", columnToUpdate);
         }
+
         setBoard(newBoard);
     };
 
