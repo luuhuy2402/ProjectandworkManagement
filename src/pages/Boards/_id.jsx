@@ -96,7 +96,6 @@ function Board() {
                 columnToUpdate.cards.push(createdCard);
                 columnToUpdate.cardOrderIds.push(createdCard._id);
             }
-            console.log("🚀 ~ createNewCard ~ columnToUpdate:", columnToUpdate);
         }
 
         setBoard(newBoard);
@@ -181,6 +180,12 @@ function Board() {
         });
     };
 
+    //Xử lý xóa một column và card bên trong nó
+    const deleteColumnDetails = (columnId) => {
+        //Update lại state Board
+        //Gọi API
+    };
+
     if (!board) {
         return (
             <Box
@@ -210,6 +215,7 @@ function Board() {
                 moveColumns={moveColumns}
                 moveCardInTheSameColumn={moveCardInTheSameColumn}
                 moveCardToDifferentColumn={moveCardToDifferentColumn}
+                deleteColumnDetails={deleteColumnDetails}
             />
         </Container>
     );

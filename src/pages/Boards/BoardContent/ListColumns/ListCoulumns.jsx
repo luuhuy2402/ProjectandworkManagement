@@ -9,7 +9,12 @@ import {
 import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
-function ListCoulumns({ columns, createNewColumn, createNewCard }) {
+function ListCoulumns({
+    columns,
+    createNewColumn,
+    createNewCard,
+    deleteColumnDetails,
+}) {
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
     const toggleOpenNewColumnForm = () =>
         setOpenNewColumnForm(!openNewColumnForm);
@@ -57,6 +62,7 @@ function ListCoulumns({ columns, createNewColumn, createNewCard }) {
                         key={column._id}
                         column={column}
                         createNewCard={createNewCard}
+                        deleteColumnDetails={deleteColumnDetails}
                     />
                 ))}
 
