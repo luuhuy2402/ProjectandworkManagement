@@ -2,9 +2,11 @@
 import { Box, CircularProgress, Container, Typography } from "@mui/material";
 import { isEmpty } from "lodash";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
     createNewCardAPI,
     createNewColumnAPI,
+    deleteColumnDetailsAPI,
     fetchBoardDetailsAPI,
     movingCardToDifferentColumnAPI,
     updateBoardDetailsAPI,
@@ -183,7 +185,16 @@ function Board() {
     //Xử lý xóa một column và card bên trong nó
     const deleteColumnDetails = (columnId) => {
         //Update lại state Board
+        const newBoard = { ...board };
+        newBoard.columns = newBoard.columns.filter((c) => c._id !== columnId);
+        newBoard.columnOrderIds = newBoard.columnOrderIds.filter(
+            (_id) => _id !== columnId
+        );
+        setBoard(newBoard);
         //Gọi API
+        deleteColumnDetailsAPI(columnId).then((res) => {
+            toast.success(res?.deleteResult);
+        });
     };
 
     if (!board) {
