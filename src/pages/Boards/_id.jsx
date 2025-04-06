@@ -1,13 +1,12 @@
 // Board details
 import { Box, CircularProgress, Container, Typography } from "@mui/material";
-import { isEmpty } from "lodash";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import {
     createNewCardAPI,
     createNewColumnAPI,
     deleteColumnDetailsAPI,
-    fetchBoardDetailsAPI,
     movingCardToDifferentColumnAPI,
     updateBoardDetailsAPI,
     updateColumnDetailsAPI,
@@ -16,41 +15,22 @@ import {
 import AppBar from "~/components/AppBar/AppBar";
 import BoardBar from "~/pages/Boards/BoardBar/BoardBar";
 import BoardContent from "~/pages/Boards/BoardContent/BoardContent";
+import {
+    fetchBoardDetailsAPI,
+    selectCurrentActiveBoard,
+    updateCurrentActiveBoard,
+} from "~/redux/activeBoard/activeBoardSlice";
 import { generatePlaceholderCard } from "~/utils/formatters";
-import { mapOrder } from "~/utils/sorts";
 
 function Board() {
-    const [board, setBoard] = useState(null);
+    const dispatch = useDispatch();
+    const board = useSelector(selectCurrentActiveBoard);
 
     useEffect(() => {
         const boardId = "67e0b0e9e39fefaf98d82e33";
         //Call API
-        fetchBoardDetailsAPI(boardId).then((board) => {
-            //Sắp xếp thứ tự column trước khi đưa dữ liệu xuống bên dưới
-            board.columns = mapOrder(
-                board.columns,
-                board.columnOrderIds,
-                "_id"
-            );
-
-            board.columns.forEach((column) => {
-                // xử lý khi mới tạo column mà chưa có card thì tạo thêm 1 card giữ chỗ để kéo thả được
-                if (isEmpty(column.cards)) {
-                    column.cards = [generatePlaceholderCard(column)];
-                    column.cardOrderIds = [generatePlaceholderCard(column)._id];
-                } else {
-                    // Sắp xếp thứ tự cards trước khi đưa dữ liệu xuống bên dưới
-                    column.cards = mapOrder(
-                        column.cards,
-                        column.cardOrderIds,
-                        "_id"
-                    );
-                }
-            });
-
-            setBoard(board);
-        });
-    }, []);
+        dispatch(fetchBoardDetailsAPI(boardId));
+    }, [dispatch]);
 
     //Gọi API tạo mới Column và cập nhật lại board
     const createNewColumn = async (newColumnData) => {
@@ -73,7 +53,8 @@ function Board() {
         const newBoard = { ...board };
         newBoard.columns.push(createdColumn);
         newBoard.columnOrderIds.push(createdColumn._id);
-        setBoard(newBoard);
+
+        dispatch(updateCurrentActiveBoard(newBoard));
     };
 
     //Gọi API tạo mới Card và cập nhật lại board
@@ -101,7 +82,7 @@ function Board() {
             }
         }
 
-        setBoard(newBoard);
+        dispatch(updateCurrentActiveBoard(newBoard));
     };
 
     // Goị API khi xử lý kéo thả column xong
@@ -112,7 +93,7 @@ function Board() {
         const newBoard = { ...board };
         newBoard.columns = dndOrderedColumns;
         newBoard.columnOrderIds = dndOrderedColumnsIds;
-        setBoard(newBoard);
+        dispatch(updateCurrentActiveBoard(newBoard));
 
         //Call API update board
         updateBoardDetailsAPI(board._id, {
@@ -137,7 +118,8 @@ function Board() {
             columnToUpdate.cards = dndOrderedCards;
             columnToUpdate.cardOrderIds = dndOrderedCardIds;
         }
-        setBoard(newBoard);
+        dispatch(updateCurrentActiveBoard(newBoard));
+
         //Gọi API update column
         updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds });
     };
@@ -158,7 +140,7 @@ function Board() {
         const newBoard = { ...board };
         newBoard.columns = dndOrderedColumns;
         newBoard.columnOrderIds = dndOrderedColumnsIds;
-        setBoard(newBoard);
+        dispatch(updateCurrentActiveBoard(newBoard));
 
         //Call API
         /**
@@ -191,7 +173,8 @@ function Board() {
         newBoard.columnOrderIds = newBoard.columnOrderIds.filter(
             (_id) => _id !== columnId
         );
-        setBoard(newBoard);
+        dispatch(updateCurrentActiveBoard(newBoard));
+
         //Gọi API
         deleteColumnDetailsAPI(columnId).then((res) => {
             toast.success(res?.deleteResult);
