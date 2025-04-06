@@ -21,6 +21,7 @@ import { mapOrder } from "~/utils/sorts";
 
 function Board() {
     const [board, setBoard] = useState(null);
+
     useEffect(() => {
         const boardId = "67e0b0e9e39fefaf98d82e33";
         //Call API
