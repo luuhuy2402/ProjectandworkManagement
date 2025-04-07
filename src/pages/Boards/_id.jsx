@@ -1,5 +1,6 @@
 // Board details
 import { Box, CircularProgress, Container, Typography } from "@mui/material";
+import { cloneDeep } from "lodash";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -50,9 +51,24 @@ function Board() {
          * Chú ys: Cách còn tùy thuộc vào từng dự án, có lúc BE sẽ hôc trợ trả về toàn bộ Board dù đây là gọi
          * API tạo Column hay Card thì lúc này chi cần setBoard với dữ liệu trả về từ API chứ ko cần push...
          */
-        const newBoard = { ...board };
+
+        /**
+         * Mặc dù đã copy/clone ra giá trị newBoard nhưng bản chất spread operator này chỉ tạo ra một bản sao nông(shallow copy) của object board
+         * Nên nếu có bất kỳ thay đổi nào trong newBoard thì board cũng sẽ bị thay đổi theo
+         * Nên dính pahri rules imutability của redux là không được phép thay đổi trực tiếp giá trị của state trong redux store
+         * => Nên phải clone sâu(deep copy) object board ra thành newBoard
+         */
+        // const newBoard = { ...board };
+        const newBoard = cloneDeep(board);
         newBoard.columns.push(createdColumn);
         newBoard.columnOrderIds.push(createdColumn._id);
+
+        /**C2: Dùng array.concat thay cho push vì concat là marge các mảng vs nhau và tạo ra mảng mới  */
+        // const newBoard = { ...board };
+        // newBoard.columns = newBoard.columns.concat(createdColumn);
+        // newBoard.columnOrderIds = newBoard.columnOrderIds.concat(
+        //     createdColumn._id
+        // );
 
         dispatch(updateCurrentActiveBoard(newBoard));
     };
