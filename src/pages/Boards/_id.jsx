@@ -81,7 +81,8 @@ function Board() {
         });
         // console.log(" createdCard", createdCard);
         //Cập nhật lại board
-        const newBoard = { ...board };
+        // const newBoard = { ...board };
+        const newBoard = cloneDeep(board);
         const columnToUpdate = newBoard.columns.find(
             (column) => column._id === createdCard.columnId
         );
@@ -106,6 +107,10 @@ function Board() {
     const moveColumns = (dndOrderedColumns) => {
         const dndOrderedColumnsIds = dndOrderedColumns.map((c) => c._id);
         //này là cập nhật phía UI để tránh bị flickering khi mà API chưa trả về
+        /**
+         * Trường hợp dùng Shallow copy ày lại ko sao bởi vì ở đây ko dùng push làm thay đổi trực tiếp giá trị của mảng mà chỉ đang gán lại
+         * toàn bộ giá trị của mảng columns và columnOrderIds cho board bằng 2 mảng mới. Tương tự như dùng concat
+         */
         const newBoard = { ...board };
         newBoard.columns = dndOrderedColumns;
         newBoard.columnOrderIds = dndOrderedColumnsIds;
@@ -125,8 +130,13 @@ function Board() {
         dndOrderedCardIds,
         columnId
     ) => {
+        /**
+         * Trường hợp Immutability ở đây đã đụng tới giá trị cards được coi là read-only (nested object - can thiệp sâu dữ liệu)
+         * Nên phải clone sâu(deep copy) object board ra thành newBoard
+         */
         //update lại state board
-        const newBoard = { ...board };
+        // const newBoard = { ...board };
+        const newBoard = cloneDeep(board);
         const columnToUpdate = newBoard.columns.find(
             (column) => column._id === columnId
         );
@@ -153,6 +163,7 @@ function Board() {
     ) => {
         const dndOrderedColumnsIds = dndOrderedColumns.map((c) => c._id);
         //này là cập nhật phía UI để tránh bị flickering khi mà API chưa trả về
+        /**Tương tự đoạn xử lý chỗ hàm moveColumns nên ko ảnh hường Immutability */
         const newBoard = { ...board };
         newBoard.columns = dndOrderedColumns;
         newBoard.columnOrderIds = dndOrderedColumnsIds;
@@ -183,6 +194,7 @@ function Board() {
 
     //Xử lý xóa một column và card bên trong nó
     const deleteColumnDetails = (columnId) => {
+        /**Tương tự ko bị vấn đề về Immutablity */
         //Update lại state Board
         const newBoard = { ...board };
         newBoard.columns = newBoard.columns.filter((c) => c._id !== columnId);
