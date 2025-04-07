@@ -28,7 +28,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
 };
 function BoardContent({
     board,
-    createNewColumn,
+    
     createNewCard,
     moveColumns,
     moveCardInTheSameColumn,
@@ -448,7 +448,7 @@ function BoardContent({
             >
                 <ListCoulumns
                     columns={orderedColumns}
-                    createNewColumn={createNewColumn}
+                    
                     createNewCard={createNewCard}
                     deleteColumnDetails={deleteColumnDetails}
                 />

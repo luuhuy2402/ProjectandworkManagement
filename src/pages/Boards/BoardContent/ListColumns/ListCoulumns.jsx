@@ -9,18 +9,25 @@ import {
 import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
-function ListCoulumns({
-    columns,
-    createNewColumn,
-    createNewCard,
-    deleteColumnDetails,
-}) {
+import { createNewColumnAPI } from "~/apis";
+import { generatePlaceholderCard } from "~/utils/formatters";
+import { cloneDeep } from "lodash";
+import {
+    selectCurrentActiveBoard,
+    updateCurrentActiveBoard,
+} from "~/redux/activeBoard/activeBoardSlice";
+import { useDispatch, useSelector } from "react-redux";
+function ListCoulumns({ columns, createNewCard, deleteColumnDetails }) {
+    const board = useSelector(selectCurrentActiveBoard);
+    const dispatch = useDispatch();
+
     const [openNewColumnForm, setOpenNewColumnForm] = useState(false);
     const toggleOpenNewColumnForm = () =>
         setOpenNewColumnForm(!openNewColumnForm);
 
     const [newColumnTitle, setNewColumnTitle] = useState("");
-    const addNewColumn = () => {
+
+    const addNewColumn = async () => {
         if (!newColumnTitle) {
             toast.warn("Please enter column title", { theme: "colored" });
             return;
@@ -29,9 +36,43 @@ function ListCoulumns({
         const newColumnData = {
             title: newColumnTitle,
         };
-        //goị hàm gọi API tạo mới Column
-        // Gọi lêm function tạo mới Column ở component cha cao nhất ( hiện tại chưa sử dụng redux )
-        createNewColumn(newColumnData);
+
+        //goị hàm gọi API tạo mới Column và làm lại state board
+        const createdColumn = await createNewColumnAPI({
+            ...newColumnData,
+            boardId: board._id,
+        });
+
+        //Thêm card giữ chỗ vào column mới tạo
+        createdColumn.cards = [generatePlaceholderCard(createdColumn)];
+        createdColumn.cardOrderIds = [
+            generatePlaceholderCard(createdColumn)._id,
+        ];
+
+        /**Cập nhật lại board
+         * Phiá FE tự làm đúng lại state data board thay vì goi lai api fetchBoardDetailsAPI
+         * Chú ys: Cách còn tùy thuộc vào từng dự án, có lúc BE sẽ hôc trợ trả về toàn bộ Board dù đây là gọi
+         * API tạo Column hay Card thì lúc này chi cần setBoard với dữ liệu trả về từ API chứ ko cần push...
+         */
+
+        /**
+         * Mặc dù đã copy/clone ra giá trị newBoard nhưng bản chất spread operator này chỉ tạo ra một bản sao nông(shallow copy) của object board
+         * Nên nếu có bất kỳ thay đổi nào trong newBoard thì board cũng sẽ bị thay đổi theo
+         * Nên dính pahri rules imutability của redux là không được phép thay đổi trực tiếp giá trị của state trong redux store
+         * => Nên phải clone sâu(deep copy) object board ra thành newBoard
+         */
+        // const newBoard = { ...board };
+        const newBoard = cloneDeep(board);
+        newBoard.columns.push(createdColumn);
+        newBoard.columnOrderIds.push(createdColumn._id);
+
+        /**C2: Dùng array.concat thay cho push vì concat là marge các mảng vs nhau và tạo ra mảng mới  */
+        // const newBoard = { ...board };
+        // newBoard.columns = newBoard.columns.concat(createdColumn);
+        // newBoard.columnOrderIds = newBoard.columnOrderIds.concat(
+        //     createdColumn._id
+        // );
+        dispatch(updateCurrentActiveBoard(newBoard));
 
         //Đóng lại trạng thái thêm Column mới & clear input
         toggleOpenNewColumnForm();
