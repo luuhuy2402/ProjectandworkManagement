@@ -20,14 +20,14 @@ import { CSS } from "@dnd-kit/utilities";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 import { useConfirm } from "material-ui-confirm";
-import { createNewCardAPI } from "~/apis";
+import { createNewCardAPI, deleteColumnDetailsAPI } from "~/apis";
 import { cloneDeep } from "lodash";
 import {
     selectCurrentActiveBoard,
     updateCurrentActiveBoard,
 } from "~/redux/activeBoard/activeBoardSlice";
 import { useDispatch, useSelector } from "react-redux";
-function Column({ column, deleteColumnDetails }) {
+function Column({ column }) {
     const board = useSelector(selectCurrentActiveBoard);
     const dispatch = useDispatch();
 
@@ -113,7 +113,7 @@ function Column({ column, deleteColumnDetails }) {
         toggleOpenNewCardForm();
         setNewCardTitle("");
     };
-    //Xử lý xóa một column và cards bên trong column\
+    //Xử lý xóa một column và cards bên trong column
     const confirmDeleteColumn = useConfirm();
     const handleDeleteColumn = () => {
         confirmDeleteColumn({
@@ -124,8 +124,21 @@ function Column({ column, deleteColumnDetails }) {
             cancellationText: "Cancel",
         })
             .then(() => {
-                //Gọi ngược lại lên component cha
-                deleteColumnDetails(column._id);
+                /**Tương tự ko bị vấn đề về Immutablity */
+                //Update lại state Board
+                const newBoard = { ...board };
+                newBoard.columns = newBoard.columns.filter(
+                    (c) => c._id !== column._id
+                );
+                newBoard.columnOrderIds = newBoard.columnOrderIds.filter(
+                    (_id) => _id !== column._id
+                );
+                dispatch(updateCurrentActiveBoard(newBoard));
+
+                //Gọi API
+                deleteColumnDetailsAPI(column._id).then((res) => {
+                    toast.success(res?.deleteResult);
+                });
             })
             .catch(() => {});
     };

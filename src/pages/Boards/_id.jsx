@@ -121,23 +121,6 @@ function Board() {
         });
     };
 
-    //Xử lý xóa một column và card bên trong nó
-    const deleteColumnDetails = (columnId) => {
-        /**Tương tự ko bị vấn đề về Immutablity */
-        //Update lại state Board
-        const newBoard = { ...board };
-        newBoard.columns = newBoard.columns.filter((c) => c._id !== columnId);
-        newBoard.columnOrderIds = newBoard.columnOrderIds.filter(
-            (_id) => _id !== columnId
-        );
-        dispatch(updateCurrentActiveBoard(newBoard));
-
-        //Gọi API
-        deleteColumnDetailsAPI(columnId).then((res) => {
-            toast.success(res?.deleteResult);
-        });
-    };
-
     if (!board) {
         return (
             <Box
@@ -162,7 +145,6 @@ function Board() {
             <BoardBar board={board} />
             <BoardContent
                 board={board}
-                deleteColumnDetails={deleteColumnDetails}
                 moveColumns={moveColumns}
                 moveCardInTheSameColumn={moveCardInTheSameColumn}
                 moveCardToDifferentColumn={moveCardToDifferentColumn}
