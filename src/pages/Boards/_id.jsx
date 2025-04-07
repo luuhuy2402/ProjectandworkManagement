@@ -20,7 +20,6 @@ import {
     selectCurrentActiveBoard,
     updateCurrentActiveBoard,
 } from "~/redux/activeBoard/activeBoardSlice";
-import { generatePlaceholderCard } from "~/utils/formatters";
 
 function Board() {
     const dispatch = useDispatch();
@@ -31,37 +30,6 @@ function Board() {
         //Call API
         dispatch(fetchBoardDetailsAPI(boardId));
     }, [dispatch]);
-
-   
-
-    //Gọi API tạo mới Card và cập nhật lại board
-    const createNewCard = async (newCardData) => {
-        const createdCard = await createNewCardAPI({
-            ...newCardData,
-            boardId: board._id,
-        });
-        // console.log(" createdCard", createdCard);
-        //Cập nhật lại board
-        // const newBoard = { ...board };
-        const newBoard = cloneDeep(board);
-        const columnToUpdate = newBoard.columns.find(
-            (column) => column._id === createdCard.columnId
-        );
-
-        if (columnToUpdate) {
-            //Nếu column rỗng(bản chất vẫn đang chứa 1 cái Placeholder card) thì khi thêm card mới sẽ xóa card đó đi còn
-            //ngược lại column ko rỗng thì thêm card thì sẽ thêm tiếp vào cuối mảng
-            if (columnToUpdate.cards.some((card) => card.FE_PlaceholderCard)) {
-                columnToUpdate.cards = [createdCard];
-                columnToUpdate.cardOrderIds = [createdCard._id];
-            } else {
-                columnToUpdate.cards.push(createdCard);
-                columnToUpdate.cardOrderIds.push(createdCard._id);
-            }
-        }
-
-        dispatch(updateCurrentActiveBoard(newBoard));
-    };
 
     // Goị API khi xử lý kéo thả column xong
     //Cập nhật lai mảng columnOrderIds của Board
@@ -194,10 +162,7 @@ function Board() {
             <BoardBar board={board} />
             <BoardContent
                 board={board}
-               
-                createNewCard={createNewCard}
                 deleteColumnDetails={deleteColumnDetails}
-
                 moveColumns={moveColumns}
                 moveCardInTheSameColumn={moveCardInTheSameColumn}
                 moveCardToDifferentColumn={moveCardToDifferentColumn}

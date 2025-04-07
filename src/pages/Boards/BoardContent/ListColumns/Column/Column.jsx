@@ -20,7 +20,17 @@ import { CSS } from "@dnd-kit/utilities";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 import { useConfirm } from "material-ui-confirm";
-function Column({ column, createNewCard, deleteColumnDetails }) {
+import { createNewCardAPI } from "~/apis";
+import { cloneDeep } from "lodash";
+import {
+    selectCurrentActiveBoard,
+    updateCurrentActiveBoard,
+} from "~/redux/activeBoard/activeBoardSlice";
+import { useDispatch, useSelector } from "react-redux";
+function Column({ column, deleteColumnDetails }) {
+    const board = useSelector(selectCurrentActiveBoard);
+    const dispatch = useDispatch();
+
     const {
         attributes,
         listeners,
@@ -56,7 +66,8 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
     const [openNewCardForm, setOpenNewCardForm] = useState(false);
     const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm);
     const [newCardTitle, setNewCardTitle] = useState("");
-    const addNewCard = () => {
+    //Xử lý thêm mới card
+    const addNewCard = async () => {
         if (!newCardTitle) {
             toast.warn("Please enter card title", {
                 position: "bottom-right",
@@ -70,9 +81,33 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
             title: newCardTitle,
             columnId: column._id,
         };
-        //goị hàm gọi API tạo mới Card
-        // Gọi lêm function tạo mới Card ở component cha cao nhất ( hiện tại chưa sử dụng redux )
-        createNewCard(newCardData);
+
+        //Gọi API tạo mới Card và cập nhật lại board
+        const createdCard = await createNewCardAPI({
+            ...newCardData,
+            boardId: board._id,
+        });
+        // console.log(" createdCard", createdCard);
+        //Cập nhật lại board
+        // const newBoard = { ...board };
+        const newBoard = cloneDeep(board);
+        const columnToUpdate = newBoard.columns.find(
+            (column) => column._id === createdCard.columnId
+        );
+
+        if (columnToUpdate) {
+            //Nếu column rỗng(bản chất vẫn đang chứa 1 cái Placeholder card) thì khi thêm card mới sẽ xóa card đó đi còn
+            //ngược lại column ko rỗng thì thêm card thì sẽ thêm tiếp vào cuối mảng
+            if (columnToUpdate.cards.some((card) => card.FE_PlaceholderCard)) {
+                columnToUpdate.cards = [createdCard];
+                columnToUpdate.cardOrderIds = [createdCard._id];
+            } else {
+                columnToUpdate.cards.push(createdCard);
+                columnToUpdate.cardOrderIds.push(createdCard._id);
+            }
+        }
+
+        dispatch(updateCurrentActiveBoard(newBoard));
 
         //Đóng lại trạng thái thêm Column mới & clear input
         toggleOpenNewCardForm();
