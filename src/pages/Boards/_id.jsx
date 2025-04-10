@@ -3,11 +3,8 @@ import { Box, CircularProgress, Container, Typography } from "@mui/material";
 import { cloneDeep } from "lodash";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
+
 import {
-    createNewCardAPI,
-    createNewColumnAPI,
-    deleteColumnDetailsAPI,
     movingCardToDifferentColumnAPI,
     updateBoardDetailsAPI,
     updateColumnDetailsAPI,
@@ -20,16 +17,19 @@ import {
     selectCurrentActiveBoard,
     updateCurrentActiveBoard,
 } from "~/redux/activeBoard/activeBoardSlice";
+import { useParams } from "react-router-dom";
 
 function Board() {
     const dispatch = useDispatch();
     const board = useSelector(selectCurrentActiveBoard);
+    //bên App params khai báo là boarId nên sẽ lấy đúng tên ra là boardID
+    const { boardId } = useParams();
 
     useEffect(() => {
-        const boardId = "67e0b0e9e39fefaf98d82e33";
+        // const boardId = "67e0b0e9e39fefaf98d82e33";
         //Call API
         dispatch(fetchBoardDetailsAPI(boardId));
-    }, [dispatch]);
+    }, [dispatch, boardId]);
 
     // Goị API khi xử lý kéo thả column xong
     //Cập nhật lai mảng columnOrderIds của Board
