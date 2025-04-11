@@ -372,6 +372,7 @@ function Column({ column }) {
                                 data-no-dnd="true"
                             >
                                 <Button
+                                    className="interceptor-loading"
                                     onClick={addNewCard}
                                     variant="contained"
                                     color="success"
