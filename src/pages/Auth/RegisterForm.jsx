@@ -1,4 +1,3 @@
-// TrungQuanDev: https://youtube.com/@trungquandev
 import { Link } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -10,11 +9,29 @@ import Zentask from "~/assets/zentask.svg?react";
 import CardActions from "@mui/material/CardActions";
 import TextField from "@mui/material/TextField";
 import Zoom from "@mui/material/Zoom";
+import { useForm } from "react-hook-form";
+import {
+    EMAIL_RULE,
+    EMAIL_RULE_MESSAGE,
+    FIELD_REQUIRED_MESSAGE,
+    PASSWORD_CONFIRMATION_MESSAGE,
+    PASSWORD_RULE,
+    PASSWORD_RULE_MESSAGE,
+} from "~/utils/validators";
+import FieldErrorAlert from "~/components/Form/FieldErrorAlert";
 
 function RegisterForm() {
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        watch,
+    } = useForm();
+    const submitRegister = (data) => {
+        console.log("submit register", data);
+    };
     return (
-        // <form onSubmit={handleSubmit(submitRegister)}>
-        <form>
+        <form onSubmit={handleSubmit(submitRegister)}>
             <Zoom in={true} style={{ transitionDelay: "200ms" }}>
                 <MuiCard
                     sx={{ minWidth: 380, maxWidth: 380, marginTop: "6em" }}
@@ -53,6 +70,18 @@ function RegisterForm() {
                                 label="Enter Email..."
                                 type="text"
                                 variant="outlined"
+                                error={!!errors["email"]} //nếu có lỗi thì textField sẽ đỏ
+                                {...register("email", {
+                                    required: FIELD_REQUIRED_MESSAGE,
+                                    pattern: {
+                                        value: EMAIL_RULE,
+                                        message: EMAIL_RULE_MESSAGE,
+                                    },
+                                })}
+                            />
+                            <FieldErrorAlert
+                                errors={errors}
+                                fieldName={"email"} //name đã đăng kí
                             />
                         </Box>
                         <Box sx={{ marginTop: "1em" }}>
@@ -61,6 +90,18 @@ function RegisterForm() {
                                 label="Enter Password..."
                                 type="password"
                                 variant="outlined"
+                                error={!!errors["password"]} //nếu có lỗi thì textField sẽ đỏ
+                                {...register("password", {
+                                    required: FIELD_REQUIRED_MESSAGE,
+                                    pattern: {
+                                        value: PASSWORD_RULE,
+                                        message: PASSWORD_RULE_MESSAGE,
+                                    },
+                                })}
+                            />
+                            <FieldErrorAlert
+                                errors={errors}
+                                fieldName={"password"} //name đã đăng kí
                             />
                         </Box>
                         <Box sx={{ marginTop: "1em" }}>
@@ -69,6 +110,18 @@ function RegisterForm() {
                                 label="Enter Password Confirmation..."
                                 type="password"
                                 variant="outlined"
+                                error={!!errors["password_confirmation"]}
+                                {...register("password_confirmation", {
+                                    validate: (value) => {
+                                        if (value === watch("password"))
+                                            return true;
+                                        return PASSWORD_CONFIRMATION_MESSAGE;
+                                    },
+                                })}
+                            />
+                            <FieldErrorAlert
+                                errors={errors}
+                                fieldName={"password_confirmation"} //name đã đăng kí
                             />
                         </Box>
                     </Box>

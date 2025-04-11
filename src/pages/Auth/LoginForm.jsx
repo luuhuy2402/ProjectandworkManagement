@@ -1,4 +1,3 @@
-// TrungQuanDev: https://youtube.com/@trungquandev
 import { Link } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -11,12 +10,28 @@ import Zentask from "~/assets/zentask.svg?react";
 import CardActions from "@mui/material/CardActions";
 import TextField from "@mui/material/TextField";
 import Zoom from "@mui/material/Zoom";
-import Alert from "@mui/material/Alert";
+// import Alert from "@mui/material/Alert";
+import { useForm } from "react-hook-form";
+import {
+    EMAIL_RULE,
+    EMAIL_RULE_MESSAGE,
+    FIELD_REQUIRED_MESSAGE,
+    PASSWORD_RULE,
+    PASSWORD_RULE_MESSAGE,
+} from "~/utils/validators";
+import FieldErrorAlert from "~/components/Form/FieldErrorAlert";
 
 function LoginForm() {
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
+    const submitLogIn = (data) => {
+        console.log("submit login", data);
+    };
     return (
-        // <form onSubmit={handleSubmit(submitLogIn)}>
-        <form>
+        <form onSubmit={handleSubmit(submitLogIn)}>
             <Zoom in={true} style={{ transitionDelay: "200ms" }}>
                 <MuiCard
                     sx={{ minWidth: 380, maxWidth: 380, marginTop: "6em" }}
@@ -46,7 +61,7 @@ function LoginForm() {
                     >
                         Author: LuuHieu
                     </Box>
-                    <Box
+                    {/* <Box
                         sx={{
                             marginTop: "1em",
                             display: "flex",
@@ -92,7 +107,7 @@ function LoginForm() {
                             Please check and verify your account before logging
                             in!
                         </Alert>
-                    </Box>
+                    </Box> */}
                     <Box sx={{ padding: "0 1em 1em 1em" }}>
                         <Box sx={{ marginTop: "1em" }}>
                             <TextField
@@ -102,6 +117,18 @@ function LoginForm() {
                                 label="Enter Email..."
                                 type="text"
                                 variant="outlined"
+                                error={!!errors["email"]} //nếu có lỗi thì textField sẽ đỏ
+                                {...register("email", {
+                                    required: FIELD_REQUIRED_MESSAGE,
+                                    pattern: {
+                                        value: EMAIL_RULE,
+                                        message: EMAIL_RULE_MESSAGE,
+                                    },
+                                })}
+                            />
+                            <FieldErrorAlert
+                                errors={errors}
+                                fieldName={"email"} //name đã đăng kí
                             />
                         </Box>
                         <Box sx={{ marginTop: "1em" }}>
@@ -110,6 +137,18 @@ function LoginForm() {
                                 label="Enter Password..."
                                 type="password"
                                 variant="outlined"
+                                error={!!errors["password"]} //nếu có lỗi thì textField sẽ đỏ
+                                {...register("password", {
+                                    required: FIELD_REQUIRED_MESSAGE,
+                                    pattern: {
+                                        value: PASSWORD_RULE,
+                                        message: PASSWORD_RULE_MESSAGE,
+                                    },
+                                })}
+                            />
+                            <FieldErrorAlert
+                                errors={errors}
+                                fieldName={"password"} //name đã đăng kí
                             />
                         </Box>
                     </Box>
